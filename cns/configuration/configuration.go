@@ -42,6 +42,7 @@ type CNSConfig struct {
 	EnableCNIConflistGeneration          bool
 	CNIConflistFilepath                  string
 	PopulateHomeAzCacheRetryIntervalSecs int
+	AZId                                 uint
 }
 
 type TelemetrySettings struct {
