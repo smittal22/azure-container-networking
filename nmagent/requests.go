@@ -39,7 +39,7 @@ type PutNetworkContainerRequest struct {
 	VNetID string `json:"virtualNetworkID"`   // the id of the customer's vnet
 
 	// Version is the new network container version
-	Version uint64 `json:"version"`
+	Version string `json:"version"`
 
 	// SubnetName is the name of the delegated subnet. This is used to
 	// authenticate the request. The list of ipv4addresses must be contained in
@@ -94,7 +94,7 @@ func (p *PutNetworkContainerRequest) Path() string {
 func (p *PutNetworkContainerRequest) Validate() error {
 	err := internal.ValidationError{}
 
-	if p.Version == 0 {
+	if p.Version == "0" {
 		err.MissingFields = append(err.MissingFields, "Version")
 	}
 
