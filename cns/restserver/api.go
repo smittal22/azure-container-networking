@@ -1147,7 +1147,7 @@ func (h *HTTPRestService) doPublish(ctx context.Context, req cns.PublishNetworkC
 
 	innerReq.AuthenticationToken = ncParameters.AuthToken
 	innerReq.PrimaryAddress = ncParameters.AssociatedInterfaceID
-
+	logger.Printf("innerReq right before nma call %+v", innerReq)
 	err = h.nma.PutNetworkContainer(ctx, &innerReq)
 	// nolint:bodyclose // existing code needs refactoring
 	if err != nil {
