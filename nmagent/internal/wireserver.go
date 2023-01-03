@@ -107,14 +107,14 @@ func (w *WireserverTransport) RoundTrip(inReq *http.Request) (*http.Response, er
 			// needs to be dressed in appropriate wrapping types before it can be
 			// assigned:
 			req.Body = io.NopCloser(strings.NewReader(emptyJSONString))
-		}
 
-		// also, because the Body is a Reader, its length cannot be known apriori.
-		// Thus, we need to manually set this length, otherwise it will be sent
-		// with no Content-Length header (and Transfer-Encoding: chunked instead).
-		// Wireserver gets angry when there's no Content-Length header, and returns
-		// a 411 status code:
-		req.ContentLength = int64(len(emptyJSONString))
+			// also, because the Body is a Reader, its length cannot be known apriori.
+			// Thus, we need to manually set this length, otherwise it will be sent
+			// with no Content-Length header (and Transfer-Encoding: chunked instead).
+			// Wireserver gets angry when there's no Content-Length header, and returns
+			// a 411 status code:
+			req.ContentLength = int64(len(emptyJSONString))
+		}
 
 		// the Content-Type must also be manually set, because the net/http
 		// Content-Type detection can't be run without draining the Reader set
