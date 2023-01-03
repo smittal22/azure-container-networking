@@ -1139,7 +1139,7 @@ func (h *HTTPRestService) doPublish(ctx context.Context, req cns.PublishNetworkC
 	var innerReq nmagent.PutNetworkContainerRequest
 	err := json.Unmarshal(innerReqBytes, &innerReq)
 	if err != nil {
-		returnMessage := fmt.Sprintf("Failed to publish Network Container in unmarshalling request: %s with err: %v", req.NetworkContainerID, err)
+		returnMessage := fmt.Sprintf("Failed to unmarshal embedded NC publish request for NC %s, with err: %v", req.NetworkContainerID, err)
 		returnCode := types.NetworkContainerPublishFailed
 		logger.Errorf("[Azure-CNS] %s", returnMessage)
 		return returnMessage, returnCode
