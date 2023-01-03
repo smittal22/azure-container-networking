@@ -94,10 +94,6 @@ func (p *PutNetworkContainerRequest) Path() string {
 func (p *PutNetworkContainerRequest) Validate() error {
 	err := internal.ValidationError{}
 
-	if p.Version == "0" {
-		err.MissingFields = append(err.MissingFields, "Version")
-	}
-
 	if p.SubnetName == "" {
 		err.MissingFields = append(err.MissingFields, "SubnetName")
 	}
