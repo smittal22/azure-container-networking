@@ -94,7 +94,7 @@ type internalNC struct {
 }
 
 func (p *PutNetworkContainerRequest) MarshalJSON() ([]byte, error) {
-	pBody := networkContainerRequest{
+	pBody := internalNC{
 		Version:    strconv.Itoa(int(p.Version)),
 		ID:         p.ID,
 		VNetID:     p.VNetID,
@@ -113,7 +113,7 @@ func (p *PutNetworkContainerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (p *PutNetworkContainerRequest) UnmarshalJSON(in []byte) error {
-	var req networkContainerRequest
+	var req internalNC
 	err := json.Unmarshal(in, &req)
 	if err != nil {
 		return errors.Wrap(err, "unmarshal network container request")
