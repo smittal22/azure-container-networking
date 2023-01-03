@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -35,6 +36,9 @@ var _ Request = &PutNetworkContainerRequest{}
 // PutNetworkContainerRequest is a collection of parameters necessary to create
 // a new network container
 type PutNetworkContainerRequest struct {
+	// NOTE(traymond): if you are adding a new field to this struct, ensure that it is also added
+	// to the MarshallJSON, UnmarshallJSON and  method as well.
+
 	ID     string `json:"networkContainerID"` // the id of the network container
 	VNetID string `json:"virtualNetworkID"`   // the id of the customer's vnet
 
@@ -71,6 +75,65 @@ type PutNetworkContainerRequest struct {
 
 	// EnableAZR denotes whether AZR is enabled for network container or not
 	EnableAZR bool `json:"enableAZR"`
+}
+
+type internalNC struct {
+	// NMAgent expects this to be a string, except that the contents of that string have to be a uint64.
+	// Therefore, the type we expose to clients uses a uint64 to guarantee that, but we
+	// convert it to a string here.
+	Version string `json:"version"`
+
+	// The rest of these are copied verbatim from the above struct and should be kept in sync.
+	ID         string   `json:"networkContainerID"`
+	VNetID     string   `json:"virtualNetworkID"`
+	SubnetName string   `json:"subnetName"`
+	IPv4Addrs  []string `json:"ipV4Addresses"`
+	Policies   []Policy `json:"policies"`
+	VlanID     int      `json:"vlanId"`
+	GREKey     uint16   `json:"greKey"`
+}
+
+func (p *PutNetworkContainerRequest) MarshalJSON() ([]byte, error) {
+	pBody := networkContainerRequest{
+		Version:    strconv.Itoa(int(p.Version)),
+		ID:         p.ID,
+		VNetID:     p.VNetID,
+		SubnetName: p.SubnetName,
+		IPv4Addrs:  p.IPv4Addrs,
+		Policies:   p.Policies,
+		VlanID:     p.VlanID,
+		GREKey:     p.GREKey,
+	}
+
+	body, err := json.Marshal(pBody)
+	if err != nil {
+		return nil, errors.Wrap(err, "marshaling PutNetworkContainerRequest")
+	}
+	return body, nil
+}
+
+func (p *PutNetworkContainerRequest) UnmarshalJSON(in []byte) error {
+	var req networkContainerRequest
+	err := json.Unmarshal(in, &req)
+	if err != nil {
+		return errors.Wrap(err, "unmarshal network container request")
+	}
+
+	version, err := strconv.ParseUint(req.Version, 10, 64)
+	if err != nil {
+		return errors.Wrap(err, "parsing version string as uint64")
+	}
+
+	p.Version = version
+	p.ID = req.ID
+	p.VNetID = req.VNetID
+	p.SubnetName = req.SubnetName
+	p.IPv4Addrs = req.IPv4Addrs
+	p.Policies = req.Policies
+	p.VlanID = req.VlanID
+	p.GREKey = req.GREKey
+
+	return nil
 }
 
 // Body marshals the JSON fields of the request and produces an Reader intended
