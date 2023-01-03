@@ -230,7 +230,7 @@ func TestPutNetworkContainerRequestPath(t *testing.T) {
 			nmagent.PutNetworkContainerRequest{
 				ID:         "00000000-0000-0000-0000-000000000000",
 				VNetID:     "11111111-1111-1111-1111-111111111111",
-				Version:    "12345",
+				Version:    uint64(12345),
 				SubnetName: "foo",
 				IPv4Addrs: []string{
 					"10.0.0.2",
@@ -278,7 +278,7 @@ func TestPutNetworkContainerRequestValidate(t *testing.T) {
 			nmagent.PutNetworkContainerRequest{
 				ID:         "00000000-0000-0000-0000-000000000000",
 				VNetID:     "11111111-1111-1111-1111-111111111111",
-				Version:    "12345",
+				Version:    uint64(12345),
 				SubnetName: "foo",
 				IPv4Addrs: []string{
 					"10.0.0.2",
@@ -301,7 +301,7 @@ func TestPutNetworkContainerRequestValidate(t *testing.T) {
 			nmagent.PutNetworkContainerRequest{
 				ID:         "00000000-0000-0000-0000-000000000000",
 				VNetID:     "11111111-1111-1111-1111-111111111111",
-				Version:    "12345",
+				Version:    uint64(12345),
 				SubnetName: "foo",
 				IPv4Addrs:  []string{}, // the important part
 				Policies: []nmagent.Policy{
@@ -321,7 +321,7 @@ func TestPutNetworkContainerRequestValidate(t *testing.T) {
 			nmagent.PutNetworkContainerRequest{
 				ID:         "00000000-0000-0000-0000-000000000000",
 				VNetID:     "11111111-1111-1111-1111-111111111111",
-				Version:    "12345",
+				Version:    uint64(12345),
 				SubnetName: "", // the important part of the test
 				IPv4Addrs: []string{
 					"10.0.0.2",
@@ -343,7 +343,7 @@ func TestPutNetworkContainerRequestValidate(t *testing.T) {
 			nmagent.PutNetworkContainerRequest{
 				ID:         "00000000-0000-0000-0000-000000000000",
 				VNetID:     "11111111-1111-1111-1111-111111111111",
-				Version:    "0",
+				Version:    uint64(0), // the important part of the test
 				SubnetName: "foo",
 				IPv4Addrs: []string{
 					"10.0.0.2",
@@ -365,7 +365,7 @@ func TestPutNetworkContainerRequestValidate(t *testing.T) {
 			nmagent.PutNetworkContainerRequest{
 				ID:         "00000000-0000-0000-0000-000000000000",
 				VNetID:     "", // the important part
-				Version:    "12345",
+				Version:    uint64(12345),
 				SubnetName: "foo",
 				IPv4Addrs: []string{
 					"10.0.0.2",

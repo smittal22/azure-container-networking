@@ -290,7 +290,7 @@ func TestNMAgentPutNetworkContainer(t *testing.T) {
 			"happy path",
 			&nmagent.PutNetworkContainerRequest{
 				ID:         "350f1e3c-4283-4f51-83a1-c44253962ef1",
-				Version:    "12345",
+				Version:    uint64(12345),
 				VNetID:     "be3a33e-61e3-42c7-bd23-6b949f57bd36",
 				SubnetName: "TestSubnet",
 				IPv4Addrs:  []string{"10.0.0.43"},
