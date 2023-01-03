@@ -361,6 +361,27 @@ func TestPutNetworkContainerRequestValidate(t *testing.T) {
 			true,
 		},
 		{
+			"no version field",
+			nmagent.PutNetworkContainerRequest{
+				ID:         "00000000-0000-0000-0000-000000000000",
+				VNetID:     "11111111-1111-1111-1111-111111111111",
+				SubnetName: "foo",
+				IPv4Addrs: []string{
+					"10.0.0.2",
+				},
+				Policies: []nmagent.Policy{
+					{
+						ID:   "Foo",
+						Type: "Bar",
+					},
+				},
+				VlanID:              0,
+				AuthenticationToken: "swordfish",
+				PrimaryAddress:      "10.0.0.1",
+			},
+			true,
+		},
+		{
 			"missing vnet id",
 			nmagent.PutNetworkContainerRequest{
 				ID:         "00000000-0000-0000-0000-000000000000",
