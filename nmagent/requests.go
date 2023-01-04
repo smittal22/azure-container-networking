@@ -39,8 +39,8 @@ type PutNetworkContainerRequest struct {
 	// NOTE(traymond): if you are adding a new field to this struct, ensure that it is also added
 	// to the MarshallJSON, UnmarshallJSON and  method as well.
 
-	ID     string `json:"networkContainerID"` // the id of the network container
-	VNetID string `json:"virtualNetworkID"`   // the id of the customer's vnet
+	ID     string `json:"networkContainerId"` // the id of the network container
+	VNetID string `json:"virtualNetworkId"`   // the id of the customer's vnet
 
 	// Version is the new network container version
 	Version uint64 `json:"version"`
@@ -78,8 +78,7 @@ type internalNC struct {
 	Version string `json:"version"`
 
 	// The rest of these are copied verbatim from the above struct and should be kept in sync.
-	ID         string   `json:"networkContainerID"`
-	VNetID     string   `json:"virtualNetworkID"`
+	VNetID     string   `json:"virtualNetworkId"`
 	SubnetName string   `json:"subnetName"`
 	IPv4Addrs  []string `json:"ipV4Addresses"`
 	Policies   []Policy `json:"policies"`
@@ -90,7 +89,6 @@ type internalNC struct {
 func (p *PutNetworkContainerRequest) MarshalJSON() ([]byte, error) {
 	pBody := internalNC{
 		Version:    strconv.Itoa(int(p.Version)),
-		ID:         p.ID,
 		VNetID:     p.VNetID,
 		SubnetName: p.SubnetName,
 		IPv4Addrs:  p.IPv4Addrs,
@@ -119,7 +117,6 @@ func (p *PutNetworkContainerRequest) UnmarshalJSON(in []byte) error {
 	}
 
 	p.Version = version
-	p.ID = req.ID
 	p.VNetID = req.VNetID
 	p.SubnetName = req.SubnetName
 	p.IPv4Addrs = req.IPv4Addrs
