@@ -130,9 +130,10 @@ func (w *WireserverTransport) RoundTrip(inReq *http.Request) (*http.Response, er
 	req2 := req.Clone(context.TODO())
 	logger.Printf("internal req headers: %v", req2.Header)
 	logger.Printf("req2 body unread: %v", req2.Body)
-	req2BodyBytes, _ := io.ReadAll(req2.Body)
-
-	logger.Printf("internal req body bytes: %v", string(req2BodyBytes))
+	if req2.Body != nil {
+		req2BodyBytes, _ := io.ReadAll(req2.Body)
+		logger.Printf("internal req body bytes: %v", string(req2BodyBytes))
+	}
 	logger.Printf("internal req host: %v", req2.Host)
 
 	resp, err := w.Transport.RoundTrip(req)
