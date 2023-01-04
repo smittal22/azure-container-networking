@@ -297,7 +297,7 @@ func TestWireserverTransportQuery(t *testing.T) {
 		Transport: &WireserverTransport{
 			Transport: &TestTripper{
 				RoundTripF: func(req *http.Request) (*http.Response, error) {
-					got = req.URL.Path
+					got = req.URL.RequestURI()
 					rr := httptest.NewRecorder()
 					_, _ = rr.WriteString(`{"httpStatusCode": "200"}`)
 					rr.WriteHeader(http.StatusOK)
@@ -319,7 +319,7 @@ func TestWireserverTransportQuery(t *testing.T) {
 	}
 	defer resp.Body.Close()
 
-	exp := "/machine/plugins/?comp=nmagent&type=test/path/api-version/1234/foo/bar"
+	exp := "/machine/plugins?comp=nmagent&type=test%2Fpath%2Fapi-version%2F1234%2Ffoo%2Fbar"
 	if got != exp {
 		t.Error("received request differs from expectation: got:", got, "want:", exp)
 	}
