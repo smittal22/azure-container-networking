@@ -136,6 +136,7 @@ func (w *WireserverTransport) RoundTrip(inReq *http.Request) (*http.Response, er
 		req.Body = io.NopCloser(bytes.NewReader(req2BodyBytes))
 	}
 	logger.Printf("internal req host: %v", req2.Host)
+	logger.Printf("url %s", req2.URL.String())
 
 	resp, err := w.Transport.RoundTrip(req)
 	if err != nil {
