@@ -38,37 +38,36 @@ var _ Request = &PutNetworkContainerRequest{}
 type PutNetworkContainerRequest struct {
 	// NOTE(traymond): if you are adding a new field to this struct, ensure that it is also added
 	// to the MarshallJSON, UnmarshallJSON and  method as well.
-
-	ID     string `json:"networkContainerId"` // the id of the network container
-	VNetID string `json:"virtualNetworkId"`   // the id of the customer's vnet
+	ID     string // the id of the network container
+	VNetID string // the id of the customer's vnet
 
 	// Version is the new network container version
-	Version uint64 `json:"version"`
+	Version uint64
 
 	// SubnetName is the name of the delegated subnet. This is used to
 	// authenticate the request. The list of ipv4addresses must be contained in
 	// the subnet's prefix.
-	SubnetName string `json:"subnetName"`
+	SubnetName string
 
 	// IPv4 addresses in the customer virtual network that will be assigned to
 	// the interface.
-	IPv4Addrs []string `json:"ipV4Addresses"`
+	IPv4Addrs []string
 
-	Policies []Policy `json:"policies"` // policies applied to the network container
+	Policies []Policy // policies applied to the network container
 
 	// VlanID is used to distinguish Network Containers with duplicate customer
 	// addresses. "0" is considered a default value by the API.
-	VlanID int `json:"vlanId"`
+	VlanID int
 
-	GREKey uint16 `json:"greKey"`
+	GREKey uint16
 
 	// AuthenticationToken is the base64 security token for the subnet containing
 	// the Network Container addresses
-	AuthenticationToken string `json:"-"`
+	AuthenticationToken string
 
 	// PrimaryAddress is the primary customer address of the interface in the
 	// management VNet
-	PrimaryAddress string `json:"-"`
+	PrimaryAddress string
 }
 
 type internalNC struct {
@@ -154,6 +153,20 @@ func (p *PutNetworkContainerRequest) Path() string {
 func (p *PutNetworkContainerRequest) Validate() error {
 	err := internal.ValidationError{}
 
+	// URL requirements:
+	if p.PrimaryAddress == "" {
+		err.MissingFields = append(err.MissingFields, "PrimaryAddress")
+	}
+
+	if p.ID == "" {
+		err.MissingFields = append(err.MissingFields, "ID")
+	}
+
+	if p.AuthenticationToken == "" {
+		err.MissingFields = append(err.MissingFields, "AuthenticationToken")
+	}
+
+	// Documented requirements:
 	if p.SubnetName == "" {
 		err.MissingFields = append(err.MissingFields, "SubnetName")
 	}
