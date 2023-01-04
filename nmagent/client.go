@@ -278,6 +278,9 @@ func die(code int, headers http.Header, body io.ReadCloser) error {
 
 func (c *Client) hostPort() string {
 	port := strconv.Itoa(int(c.port))
+	if c.port == 80 {
+		return c.host
+	}
 	return net.JoinHostPort(c.host, port)
 }
 
