@@ -7,6 +7,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -22,7 +23,7 @@ const (
 )
 
 const (
-	WirePrefix string = "/machine/plugins/?comp=nmagent&type="
+	WirePluginPath string = "/machine/plugins"
 
 	// DefaultBufferSize is the maximum number of bytes read from Wireserver in
 	// the event that no Content-Length is provided. The responses are relatively
@@ -62,6 +63,28 @@ type WireserverTransport struct {
 	Transport http.RoundTripper
 }
 
+// WireserverPluginQuery is a construct for executing queries against plugins
+// of Wireserver
+type WireserverPluginQuery struct {
+	Component string
+	Type      string
+}
+
+func (w WireserverPluginQuery) String() string {
+	vals := url.Values{}
+
+	// the query string from the request must have its constituent parts (?,=,&)
+	// transformed to slashes and appended to the query
+	path := w.Type[1:]
+	path = strings.ReplaceAll(path, "?", "/")
+	path = strings.ReplaceAll(path, "=", "/")
+	path = strings.ReplaceAll(path, "&", "/")
+
+	vals["comp"] = []string{w.Component}
+	vals["type"] = []string{path}
+	return vals.Encode()
+}
+
 // RoundTrip executes arbitrary HTTP requests against Wireserver while applying
 // the necessary transformation rules to make such requests acceptable to
 // Wireserver.
@@ -73,23 +96,13 @@ func (w *WireserverTransport) RoundTrip(inReq *http.Request) (*http.Response, er
 	ctx := inReq.Context()
 	req := inReq.Clone(ctx)
 
-	// the original path of the request must be prefixed with wireserver's path
-	path := WirePrefix
-	if req.URL.Path != "" {
-		path += req.URL.Path[1:]
+	// requests to NMAgent occur through wireserver's plugin path
+	req.URL.Path = WirePluginPath
+	q := WireserverPluginQuery{
+		Component: "nmagent",
+		Type:      inReq.URL.RequestURI(),
 	}
-
-	// the query string from the request must have its constituent parts (?,=,&)
-	// transformed to slashes and appended to the query
-	if req.URL.RawQuery != "" {
-		query := req.URL.RawQuery
-		query = strings.ReplaceAll(query, "?", "/")
-		query = strings.ReplaceAll(query, "=", "/")
-		query = strings.ReplaceAll(query, "&", "/")
-		path += "/" + query
-	}
-
-	req.URL.Path = path
+	req.URL.RawQuery = q.String()
 
 	// wireserver cannot tolerate PUT requests, so it's necessary to transform
 	// those to POSTs
