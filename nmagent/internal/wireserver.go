@@ -2,7 +2,6 @@ package internal
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -11,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Azure/azure-container-networking/cns/logger"
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -140,17 +138,6 @@ func (w *WireserverTransport) RoundTrip(inReq *http.Request) (*http.Response, er
 	}
 
 	// execute the request to the downstream transport
-	req2 := req.Clone(context.TODO())
-	logger.Printf("internal req headers: %v", req2.Header)
-	logger.Printf("req2 body unread: %v", req2.Body)
-	if req2.Body != nil {
-		req2BodyBytes, _ := io.ReadAll(req2.Body)
-		logger.Printf("internal req body bytes: %v", string(req2BodyBytes))
-		req.Body = io.NopCloser(bytes.NewReader(req2BodyBytes))
-	}
-	logger.Printf("internal req host: %v", req2.Host)
-	logger.Printf("url %s", req2.URL.String())
-
 	resp, err := w.Transport.RoundTrip(req)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "executing request to wireserver")
