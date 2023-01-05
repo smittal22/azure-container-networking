@@ -387,6 +387,7 @@ func TestNMAgentDeleteNC(t *testing.T) {
 				PrimaryAddress:      "10.0.0.1",
 				AuthenticationToken: "swordfish",
 			},
+			//nolint:lll // not a useful linter in a test
 			"/machine/plugins?comp=nmagent&type=NetworkManagement%2Finterfaces%2F10.0.0.1%2FnetworkContainers%2F00000000-0000-0000-0000-000000000000%2FauthenticationToken%2Fswordfish%2Fapi-version%2F1%2Fmethod%2FDELETE",
 			false,
 		},

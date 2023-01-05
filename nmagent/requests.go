@@ -110,6 +110,7 @@ func (p *PutNetworkContainerRequest) UnmarshalJSON(in []byte) error {
 		return errors.Wrap(err, "unmarshal network container request")
 	}
 
+	//nolint:gomnd // these magic numbers are well-documented in ParseUint
 	version, err := strconv.ParseUint(req.Version, 10, 64)
 	if err != nil {
 		return errors.Wrap(err, "parsing version string as uint64")

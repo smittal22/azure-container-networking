@@ -51,12 +51,14 @@ func TestWireserverTransportPathTransform(t *testing.T) {
 		{
 			"publish",
 			http.MethodPost,
+			//nolint:lll // not a useful linter in a test
 			"/NetworkManagement/interfaces/10.224.0.33/networkContainers/99e8b0e0-3524-490b-b2ca-31928e6d75a3?authenticationToken=6e4f70a6-a379-4f76-8e7a-2ae18392dc07&api-version=1",
 			"/machine/plugins?comp=nmagent&type=NetworkManagement%2Finterfaces%2F10.224.0.33%2FnetworkContainers%2F99e8b0e0-3524-490b-b2ca-31928e6d75a3%2FauthenticationToken%2F6e4f70a6-a379-4f76-8e7a-2ae18392dc07%2Fapi-version%2F1",
 		},
 		{
 			"publish with munged uri",
 			http.MethodPost,
+			//nolint:lll // not a useful linter in a test
 			"/NetworkManagement/interfaces/10.224.0.33/networkContainers/99e8b0e0-3524-490b-b2ca-31928e6d75a3/authenticationToken/6e4f70a6-a379-4f76-8e7a-2ae18392dc07/api-version/1",
 			"/machine/plugins?comp=nmagent&type=NetworkManagement%2Finterfaces%2F10.224.0.33%2FnetworkContainers%2F99e8b0e0-3524-490b-b2ca-31928e6d75a3%2FauthenticationToken%2F6e4f70a6-a379-4f76-8e7a-2ae18392dc07%2Fapi-version%2F1",
 		},
