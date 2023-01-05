@@ -403,6 +403,69 @@ func TestPutNetworkContainerRequestValidate(t *testing.T) {
 			},
 			false,
 		},
+		{
+			"missing PrimaryAddress",
+			nmagent.PutNetworkContainerRequest{
+				ID:         "00000000-0000-0000-0000-000000000000",
+				VNetID:     "11111111-1111-1111-1111-111111111111",
+				Version:    uint64(12345),
+				SubnetName: "foo",
+				IPv4Addrs: []string{
+					"10.0.0.2",
+				},
+				Policies: []nmagent.Policy{
+					{
+						ID:   "Foo",
+						Type: "Bar",
+					},
+				},
+				VlanID:              0,
+				AuthenticationToken: "swordfish",
+			},
+			false,
+		},
+		{
+			"missing ID",
+			nmagent.PutNetworkContainerRequest{
+				VNetID:     "11111111-1111-1111-1111-111111111111",
+				Version:    uint64(12345),
+				SubnetName: "foo",
+				IPv4Addrs: []string{
+					"10.0.0.2",
+				},
+				Policies: []nmagent.Policy{
+					{
+						ID:   "Foo",
+						Type: "Bar",
+					},
+				},
+				VlanID:              0,
+				AuthenticationToken: "swordfish",
+				PrimaryAddress:      "10.0.0.1",
+			},
+			false,
+		},
+		{
+			"missing AuthenticationToken",
+			nmagent.PutNetworkContainerRequest{
+				ID:         "00000000-0000-0000-0000-000000000000",
+				VNetID:     "11111111-1111-1111-1111-111111111111",
+				Version:    uint64(12345),
+				SubnetName: "foo",
+				IPv4Addrs: []string{
+					"10.0.0.2",
+				},
+				Policies: []nmagent.Policy{
+					{
+						ID:   "Foo",
+						Type: "Bar",
+					},
+				},
+				VlanID:         0,
+				PrimaryAddress: "10.0.0.1",
+			},
+			false,
+		},
 	}
 
 	for _, test := range validationTests {
