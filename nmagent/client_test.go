@@ -311,6 +311,30 @@ func TestNMAgentPutNetworkContainer(t *testing.T) {
 			true,
 			false,
 		},
+		{
+			"no id",
+			&nmagent.PutNetworkContainerRequest{
+				Version:    uint64(12345),
+				VNetID:     "be3a33e-61e3-42c7-bd23-6b949f57bd36",
+				SubnetName: "TestSubnet",
+				IPv4Addrs:  []string{"10.0.0.43"},
+				Policies: []nmagent.Policy{
+					{
+						ID:   "policyID1",
+						Type: "type1",
+					},
+					{
+						ID:   "policyID2",
+						Type: "type2",
+					},
+				},
+				VlanID:              1234,
+				AuthenticationToken: "swordfish",
+				PrimaryAddress:      "10.0.0.1",
+			},
+			false,
+			true,
+		},
 	}
 
 	for _, test := range putNCTests {
