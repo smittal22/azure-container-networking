@@ -70,10 +70,10 @@ type PutNetworkContainerRequest struct {
 	PrimaryAddress string
 
 	// AzID is the home AZ ID of the network container
-	AzID uint `json:"azID"`
+	AzID uint
 
 	// EnableAZR denotes whether AZR is enabled for network container or not
-	EnableAZR bool `json:"enableAZR"`
+	EnableAZR bool
 }
 
 type internalNC struct {
