@@ -1371,8 +1371,6 @@ func (service *HTTPRestService) unpublishNetworkContainer(w http.ResponseWriter,
 			dcr.PrimaryAddress = ncParameters.AssociatedInterfaceID
 			dcr.AuthenticationToken = ncParameters.AuthToken
 
-			logger.Printf("delete container request AFTER is %+v", dcr)
-
 			// Unpublish Network Container
 			returnMessage, returnCode = service.doUnpublish(ctx, req, dcr)
 		}
