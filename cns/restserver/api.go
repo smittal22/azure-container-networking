@@ -1273,7 +1273,7 @@ func (h *HTTPRestService) doUnpublish(ctx context.Context, req cns.UnpublishNetw
 
 	err := json.Unmarshal(innerReqBytes, &dcr)
 	if err != nil {
-		returnMessage := fmt.Sprintf("Failed to unpublish Network Container: %s", req.NetworkContainerID)
+		returnMessage := fmt.Sprintf("Failed to unmarshal NC unpublish request for NC %s, with error: %v", req.NetworkContainerID, err)
 		returnCode := types.NetworkContainerUnpublishFailed
 		logger.Errorf("[Azure-CNS] %s", returnMessage)
 		return returnMessage, returnCode
@@ -1282,7 +1282,7 @@ func (h *HTTPRestService) doUnpublish(ctx context.Context, req cns.UnpublishNetw
 	err = h.nma.DeleteNetworkContainer(ctx, dcr)
 	// nolint:bodyclose // existing code needs refactoring
 	if err != nil {
-		returnMessage := fmt.Sprintf("Failed to unpublish Network Container: %s", req.NetworkContainerID)
+		returnMessage := fmt.Sprintf("Failed to unpublish Network Container: %s. Error: %+v", req.NetworkContainerID, err)
 		returnCode := types.NetworkContainerUnpublishFailed
 		logger.Errorf("[Azure-CNS] %s", returnMessage)
 		return returnMessage, returnCode
@@ -1366,11 +1366,10 @@ func (service *HTTPRestService) unpublishNetworkContainer(w http.ResponseWriter,
 		}
 
 		if isNetworkJoined {
-			dcr := nmagent.DeleteContainerRequest{
-				NCID:                req.NetworkContainerID,
-				PrimaryAddress:      ncParameters.AssociatedInterfaceID,
-				AuthenticationToken: ncParameters.AuthToken,
-			}
+			var dcr nmagent.DeleteContainerRequest
+			dcr.NCID = req.NetworkContainerID
+			dcr.PrimaryAddress = ncParameters.AssociatedInterfaceID
+			dcr.AuthenticationToken = ncParameters.AuthToken
 
 			// Unpublish Network Container
 			returnMessage, returnCode = service.doUnpublish(ctx, req, dcr)
