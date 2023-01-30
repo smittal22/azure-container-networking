@@ -3,12 +3,13 @@ package configuration
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
+
 	"github.com/Azure/azure-container-networking/cns"
 	"github.com/Azure/azure-container-networking/cns/logger"
 	"github.com/Azure/azure-container-networking/common"
 	"github.com/pkg/errors"
-	"os"
-	"path/filepath"
 )
 
 const (
