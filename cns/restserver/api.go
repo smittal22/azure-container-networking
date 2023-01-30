@@ -1271,7 +1271,19 @@ func (service *HTTPRestService) publishNetworkContainer(w http.ResponseWriter, r
 //nolint:revive // the previous receiver naming "service" is bad, this is correct:
 func (h *HTTPRestService) doUnpublish(ctx context.Context, req cns.UnpublishNetworkContainerRequest, dcr nmagent.DeleteContainerRequest) (string, types.ResponseCode) {
 
-	err := h.nma.DeleteNetworkContainer(ctx, dcr)
+	innerReqBytes := req.DeleteNetworkContainerRequestBody
+
+	err := json.Unmarshal(innerReqBytes, &dcr)
+	if err != nil {
+		returnMessage := fmt.Sprintf("Failed to unmarshal NC unpublish request for NC %s, with err: %v", req.NetworkContainerID, err)
+		returnCode := types.NetworkContainerUnpublishFailed
+		logger.Errorf("[Azure-CNS] %s", returnMessage)
+		return returnMessage, returnCode
+	}
+
+	logger.Printf("[SAKSHAM LOG] dcr is %v", dcr)
+
+	err = h.nma.DeleteNetworkContainer(ctx, dcr)
 	// nolint:bodyclose // existing code needs refactoring
 	if err != nil {
 		returnMessage := fmt.Sprintf("Failed to unpublish Network Container: %s. Error: %+v", req.NetworkContainerID, err)
@@ -1358,14 +1370,10 @@ func (service *HTTPRestService) unpublishNetworkContainer(w http.ResponseWriter,
 		}
 
 		if isNetworkJoined {
+			printBody := string(req.DeleteNetworkContainerRequestBody)
+			logger.Printf("body passed to CNS is %s", printBody)
+
 			var dcr nmagent.DeleteContainerRequest
-			innerReqBytes := req.DeleteNetworkContainerRequestBody
-			err := json.Unmarshal(innerReqBytes, &dcr)
-			if err != nil {
-				returnMessage := fmt.Sprintf("Failed to unmarshal: %s. Error: %+v", req.NetworkContainerID, err)
-				// returnCode := types.NetworkContainerUnpublishFailed
-				logger.Errorf("[Azure-CNS] %s", returnMessage)
-			}
 
 			dcr.NCID = req.NetworkContainerID
 			dcr.PrimaryAddress = ncParameters.AssociatedInterfaceID

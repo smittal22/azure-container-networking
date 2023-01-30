@@ -139,69 +139,6 @@ func (p *PutNetworkContainerRequest) UnmarshalJSON(in []byte) error {
 	return nil
 }
 
-type internalNC struct {
-	// NMAgent expects this to be a string, except that the contents of that string have to be a uint64.
-	// Therefore, the type we expose to clients uses a uint64 to guarantee that, but we
-	// convert it to a string here.
-	Version string `json:"version"`
-
-	// The rest of these are copied verbatim from the above struct and should be kept in sync.
-	VNetID     string   `json:"virtualNetworkId"`
-	SubnetName string   `json:"subnetName"`
-	IPv4Addrs  []string `json:"ipV4Addresses"`
-	Policies   []Policy `json:"policies"`
-	VlanID     int      `json:"vlanId"`
-	GREKey     uint16   `json:"greKey"`
-	AzID       uint     `json:"azID"`
-	EnableAZR  bool     `json:"enableAZR"`
-}
-
-func (p *PutNetworkContainerRequest) MarshalJSON() ([]byte, error) {
-	pBody := internalNC{
-		Version:    strconv.Itoa(int(p.Version)),
-		VNetID:     p.VNetID,
-		SubnetName: p.SubnetName,
-		IPv4Addrs:  p.IPv4Addrs,
-		Policies:   p.Policies,
-		VlanID:     p.VlanID,
-		GREKey:     p.GREKey,
-		AzID:       p.AzID,
-		EnableAZR:  p.EnableAZR,
-	}
-
-	body, err := json.Marshal(pBody)
-	if err != nil {
-		return nil, errors.Wrap(err, "marshaling PutNetworkContainerRequest")
-	}
-	return body, nil
-}
-
-func (p *PutNetworkContainerRequest) UnmarshalJSON(in []byte) error {
-	var req internalNC
-	err := json.Unmarshal(in, &req)
-	if err != nil {
-		return errors.Wrap(err, "unmarshal network container request")
-	}
-
-	//nolint:gomnd // these magic numbers are well-documented in ParseUint
-	version, err := strconv.ParseUint(req.Version, 10, 64)
-	if err != nil {
-		return errors.Wrap(err, "parsing version string as uint64")
-	}
-
-	p.Version = version
-	p.VNetID = req.VNetID
-	p.SubnetName = req.SubnetName
-	p.IPv4Addrs = req.IPv4Addrs
-	p.Policies = req.Policies
-	p.VlanID = req.VlanID
-	p.GREKey = req.GREKey
-	p.AzID = req.AzID
-	p.EnableAZR = req.EnableAZR
-
-	return nil
-}
-
 // Body marshals the JSON fields of the request and produces an Reader intended
 // for use with an HTTP request
 func (p *PutNetworkContainerRequest) Body() (io.Reader, error) {
