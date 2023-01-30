@@ -15,6 +15,7 @@ const (
 	podCrudTag    Tag = "pod-crud"
 	nsCrudTag     Tag = "namespace-crud"
 	netpolCrudTag Tag = "netpol-crud"
+	reconcileTag  Tag = "reconcile"
 )
 
 const (
@@ -155,6 +156,7 @@ func getAllSerialTests() []*SerialTestCase {
 			TestCaseMetadata: &TestCaseMetadata{
 				Tags: []Tag{
 					podCrudTag,
+					reconcileTag,
 				},
 				DpCfg:            defaultWindowsDPCfg,
 				InitialEndpoints: nil,
@@ -264,7 +266,7 @@ func getAllSerialTests() []*SerialTestCase {
 			},
 		},
 		{
-			Description: "pod created off node (no local endpoint), then relevant policy created",
+			Description: "pod created off node (no endpoint), then relevant policy created",
 			Actions: []*Action{
 				CreatePod("x", "a", ip1, otherNode, map[string]string{"k1": "v1"}),
 				// will apply dirty ipsets from CreatePod
@@ -285,6 +287,33 @@ func getAllSerialTests() []*SerialTestCase {
 					dptestutils.SetPolicy(podK1V1Set, ip1),
 				},
 				ExpectedEnpdointACLs: nil,
+			},
+		},
+		{
+			Description: "pod created off node (remote endpoint), then relevant policy created",
+			Actions: []*Action{
+				CreateRemoteEndpoint(endpoint1, ip1),
+				CreatePod("x", "a", ip1, otherNode, map[string]string{"k1": "v1"}),
+				// will apply dirty ipsets from CreatePod
+				UpdatePolicy(policyXBaseOnK1V1()),
+			},
+			TestCaseMetadata: &TestCaseMetadata{
+				Tags: []Tag{
+					podCrudTag,
+					netpolCrudTag,
+				},
+				DpCfg:            defaultWindowsDPCfg,
+				InitialEndpoints: nil,
+				ExpectedSetPolicies: []*hcn.SetPolicySetting{
+					dptestutils.SetPolicy(emptySet),
+					dptestutils.SetPolicy(allNamespaces, emptySet.GetHashedName(), nsXSet.GetHashedName()),
+					dptestutils.SetPolicy(nsXSet, ip1),
+					dptestutils.SetPolicy(podK1Set, ip1),
+					dptestutils.SetPolicy(podK1V1Set, ip1),
+				},
+				ExpectedEnpdointACLs: map[string][]*hnswrapper.FakeEndpointPolicy{
+					endpoint1: {},
+				},
 			},
 		},
 		{
@@ -334,6 +363,57 @@ func getAllSerialTests() []*SerialTestCase {
 							Priority:        222,
 						},
 					},
+				},
+			},
+		},
+		{
+			Description: "policy created, then pod created off node (no endpoint) which satisfies policy",
+			Actions: []*Action{
+				UpdatePolicy(policyXBaseOnK1V1()),
+				CreatePod("x", "a", ip1, otherNode, map[string]string{"k1": "v1"}),
+				ApplyDP(),
+			},
+			TestCaseMetadata: &TestCaseMetadata{
+				Tags: []Tag{
+					podCrudTag,
+					netpolCrudTag,
+				},
+				DpCfg:            defaultWindowsDPCfg,
+				InitialEndpoints: nil,
+				ExpectedSetPolicies: []*hcn.SetPolicySetting{
+					dptestutils.SetPolicy(emptySet),
+					dptestutils.SetPolicy(allNamespaces, emptySet.GetHashedName(), nsXSet.GetHashedName()),
+					dptestutils.SetPolicy(nsXSet, ip1),
+					dptestutils.SetPolicy(podK1Set, ip1),
+					dptestutils.SetPolicy(podK1V1Set, ip1),
+				},
+				ExpectedEnpdointACLs: nil,
+			},
+		},
+		{
+			Description: "policy created, then pod created off node (remote endpoint) which satisfies policy",
+			Actions: []*Action{
+				UpdatePolicy(policyXBaseOnK1V1()),
+				CreateRemoteEndpoint(endpoint1, ip1),
+				CreatePod("x", "a", ip1, otherNode, map[string]string{"k1": "v1"}),
+				ApplyDP(),
+			},
+			TestCaseMetadata: &TestCaseMetadata{
+				Tags: []Tag{
+					podCrudTag,
+					netpolCrudTag,
+				},
+				DpCfg:            defaultWindowsDPCfg,
+				InitialEndpoints: nil,
+				ExpectedSetPolicies: []*hcn.SetPolicySetting{
+					dptestutils.SetPolicy(emptySet),
+					dptestutils.SetPolicy(allNamespaces, emptySet.GetHashedName(), nsXSet.GetHashedName()),
+					dptestutils.SetPolicy(nsXSet, ip1),
+					dptestutils.SetPolicy(podK1Set, ip1),
+					dptestutils.SetPolicy(podK1V1Set, ip1),
+				},
+				ExpectedEnpdointACLs: map[string][]*hnswrapper.FakeEndpointPolicy{
+					endpoint1: {},
 				},
 			},
 		},
@@ -404,6 +484,33 @@ func getAllSerialTests() []*SerialTestCase {
 				},
 			},
 		},
+		{
+			Description: "issue 1613: remove last instance of label, then reconcile IPSets, then apply DP",
+			Actions: []*Action{
+				CreateEndpoint(endpoint1, ip1),
+				CreatePod("x", "a", ip1, thisNode, map[string]string{"k1": "v1"}),
+				ApplyDP(),
+				UpdatePodLabels("x", "a", ip1, thisNode, map[string]string{"k1": "v1"}, nil),
+				ReconcileDP(),
+				ApplyDP(),
+			},
+			TestCaseMetadata: &TestCaseMetadata{
+				Tags: []Tag{
+					podCrudTag,
+					reconcileTag,
+				},
+				DpCfg:            defaultWindowsDPCfg,
+				InitialEndpoints: nil,
+				ExpectedSetPolicies: []*hcn.SetPolicySetting{
+					dptestutils.SetPolicy(emptySet),
+					dptestutils.SetPolicy(allNamespaces, emptySet.GetHashedName(), nsXSet.GetHashedName()),
+					dptestutils.SetPolicy(nsXSet, ip1),
+				},
+				ExpectedEnpdointACLs: map[string][]*hnswrapper.FakeEndpointPolicy{
+					endpoint1: {},
+				},
+			},
+		},
 	}
 }
 
@@ -434,8 +541,9 @@ func getAllMultiJobTests() []*MultiJobTestCase {
 				},
 				DpCfg: defaultWindowsDPCfg,
 				InitialEndpoints: []*hcn.HostComputeEndpoint{
+					// ends up being 2 identical endpoints (test2)??
 					dptestutils.Endpoint(endpoint1, ip1),
-					dptestutils.Endpoint(endpoint2, ip2),
+					dptestutils.RemoteEndpoint(endpoint2, ip2),
 				},
 				ExpectedSetPolicies: []*hcn.SetPolicySetting{
 					dptestutils.SetPolicy(emptySet),

@@ -19,25 +19,29 @@ const (
 )
 
 type CNSConfig struct {
-	ChannelMode                 string
-	EnablePprof                 bool
-	EnableSubnetScarcity        bool
-	InitializeFromCNI           bool
-	ManagedSettings             ManagedSettings
-	MetricsBindAddress          string
-	SyncHostNCTimeoutMs         int
-	SyncHostNCVersionIntervalMs int
-	TLSCertificatePath          string
-	TLSEndpoint                 string
-	TLSPort                     string
-	TLSSubjectName              string
-	TelemetrySettings           TelemetrySettings
-	UseHTTPS                    bool
-	WireserverIP                string
-	KeyVaultSettings            KeyVaultSettings
-	MSISettings                 MSISettings
-	ProgramSNATIPTables         bool
-	ManageEndpointState         bool
+	ChannelMode                          string
+	EnablePprof                          bool
+	EnableSubnetScarcity                 bool
+	InitializeFromCNI                    bool
+	ManagedSettings                      ManagedSettings
+	MetricsBindAddress                   string
+	SyncHostNCTimeoutMs                  int
+	SyncHostNCVersionIntervalMs          int
+	TLSCertificatePath                   string
+	TLSEndpoint                          string
+	TLSPort                              string
+	TLSSubjectName                       string
+	TelemetrySettings                    TelemetrySettings
+	UseHTTPS                             bool
+	WireserverIP                         string
+	KeyVaultSettings                     KeyVaultSettings
+	MSISettings                          MSISettings
+	ProgramSNATIPTables                  bool
+	ManageEndpointState                  bool
+	CNIConflistScenario                  string
+	EnableCNIConflistGeneration          bool
+	CNIConflistFilepath                  string
+	PopulateHomeAzCacheRetryIntervalSecs int
 }
 
 type TelemetrySettings struct {
@@ -184,5 +188,9 @@ func SetCNSConfigDefaults(config *CNSConfig) {
 	}
 	if config.SyncHostNCTimeoutMs == 0 {
 		config.SyncHostNCTimeoutMs = 500 //nolint:gomnd // default times
+	}
+	if config.PopulateHomeAzCacheRetryIntervalSecs == 0 {
+		// set the default PopulateHomeAzCache retry interval to 15 seconds
+		config.PopulateHomeAzCacheRetryIntervalSecs = 15
 	}
 }
