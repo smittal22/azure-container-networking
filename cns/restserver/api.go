@@ -1261,17 +1261,19 @@ func (service *HTTPRestService) publishNetworkContainer(w http.ResponseWriter, r
 func (h *HTTPRestService) doUnpublish(ctx context.Context, req cns.UnpublishNetworkContainerRequest, dcr nmagent.DeleteContainerRequest) (string, types.ResponseCode) {
 	innerReqBytes := req.DeleteNetworkContainerRequestBody
 
-	err := json.Unmarshal(innerReqBytes, &dcr)
-	if err != nil {
-		returnMessage := fmt.Sprintf("Failed to unmarshal NC unpublish request for NC %s, with error: %v", req.NetworkContainerID, err)
-		returnCode := types.NetworkContainerUnpublishFailed
-		logger.Errorf("[Azure-CNS] %s", returnMessage)
-		return returnMessage, returnCode
+	if len(innerReqBytes) != 0 {
+		err := json.Unmarshal(innerReqBytes, &dcr)
+		if err != nil {
+			returnMessage := fmt.Sprintf("Failed to unmarshal NC unpublish request for NC %s, with error: %v", req.NetworkContainerID, err)
+			returnCode := types.NetworkContainerUnpublishFailed
+			logger.Errorf("[Azure-CNS] %s", returnMessage)
+			return returnMessage, returnCode
+		}
 	}
 
-	err = h.nma.DeleteNetworkContainer(ctx, dcr)
+	errDelete := h.nma.DeleteNetworkContainer(ctx, dcr)
 	// nolint:bodyclose // existing code needs refactoring
-	if err != nil {
+	if errDelete != nil {
 		returnMessage := fmt.Sprintf("Failed to unpublish Network Container: %s. Error: %+v", req.NetworkContainerID, err)
 		returnCode := types.NetworkContainerUnpublishFailed
 		logger.Errorf("[Azure-CNS] %s", returnMessage)
@@ -1369,6 +1371,9 @@ func (service *HTTPRestService) unpublishNetworkContainer(w http.ResponseWriter,
 		returnCode = types.UnsupportedVerb
 	}
 
+	if returnCode != 0 {
+		unpublishStatusCode = http.StatusInternalServerError
+	}
 	// create a synthetic response from NMAgent so that clients that previously
 	// relied on its presence can continue to do so.
 	unpublishResponseBody := fmt.Sprintf(`{"httpStatusCode":"%d"}`, unpublishStatusCode)
