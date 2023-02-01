@@ -1274,7 +1274,7 @@ func (h *HTTPRestService) doUnpublish(ctx context.Context, req cns.UnpublishNetw
 	errDelete := h.nma.DeleteNetworkContainer(ctx, dcr)
 	// nolint:bodyclose // existing code needs refactoring
 	if errDelete != nil {
-		returnMessage := fmt.Sprintf("Failed to unpublish Network Container: %s. Error: %+v", req.NetworkContainerID, err)
+		returnMessage := fmt.Sprintf("Failed to unpublish Network Container: %s. Error: %+v", req.NetworkContainerID, errDelete)
 		returnCode := types.NetworkContainerUnpublishFailed
 		logger.Errorf("[Azure-CNS] %s", returnMessage)
 		return returnMessage, returnCode
