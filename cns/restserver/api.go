@@ -1239,6 +1239,10 @@ func (service *HTTPRestService) publishNetworkContainer(w http.ResponseWriter, r
 		returnCode = types.UnsupportedVerb
 	}
 
+	if returnCode != 0 {
+		publishStatusCode = http.StatusInternalServerError
+	}
+
 	// create a synthetic response from NMAgent so that clients that previously
 	// relied on its presence can continue to do so.
 	publishResponseBody := fmt.Sprintf(`{"httpStatusCode":"%d"}`, publishStatusCode)
@@ -1348,6 +1352,10 @@ func (service *HTTPRestService) unpublishNetworkContainer(w http.ResponseWriter,
 	default:
 		returnMessage = "UnpublishNetworkContainer API expects a POST"
 		returnCode = types.UnsupportedVerb
+	}
+
+	if returnCode != 0 {
+		unpublishStatusCode = http.StatusInternalServerError
 	}
 
 	// create a synthetic response from NMAgent so that clients that previously
