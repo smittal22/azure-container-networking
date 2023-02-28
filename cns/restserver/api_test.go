@@ -1035,10 +1035,11 @@ func unpublishNCViaCNS(networkID, networkContainerID, deleteNetworkContainerURL 
 	joinNetworkURL := "http://" + nmagentEndpoint + "/dummyVnetURL"
 
 	unpublishNCRequest := &cns.UnpublishNetworkContainerRequest{
-		NetworkID:                 networkID,
-		NetworkContainerID:        networkContainerID,
-		JoinNetworkURL:            joinNetworkURL,
-		DeleteNetworkContainerURL: deleteNetworkContainerURL,
+		NetworkID:                         networkID,
+		NetworkContainerID:                networkContainerID,
+		JoinNetworkURL:                    joinNetworkURL,
+		DeleteNetworkContainerURL:         deleteNetworkContainerURL,
+		DeleteNetworkContainerRequestBody: []byte("{}"),
 	}
 
 	var body bytes.Buffer
