@@ -60,13 +60,11 @@ func (p *Proxy) PublishNC(ctx context.Context, ncParams cns.NetworkContainerPara
 func (p *Proxy) UnpublishNC(ctx context.Context, ncParams cns.NetworkContainerParameters, payload []byte) (*http.Response, error) {
 	reqURL := fmt.Sprintf(unpublishNCURLFmt, p.Host, ncParams.AssociatedInterfaceID, ncParams.NCID, ncParams.AuthToken)
 
-	var body []byte
-	if len(payload) != 0 {
+	body := []byte(`""`)
+	if len(payload) > 0 {
 		body = payload
-	} else {
-		body = []byte("")
 	}
-	
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, reqURL, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, errors.Wrap(err, "wireserver proxy: unpublish nc: could not build http request")
