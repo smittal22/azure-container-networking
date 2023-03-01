@@ -60,6 +60,8 @@ func (p *Proxy) PublishNC(ctx context.Context, ncParams cns.NetworkContainerPara
 func (p *Proxy) UnpublishNC(ctx context.Context, ncParams cns.NetworkContainerParameters, payload []byte) (*http.Response, error) {
 	reqURL := fmt.Sprintf(unpublishNCURLFmt, p.Host, ncParams.AssociatedInterfaceID, ncParams.NCID, ncParams.AuthToken)
 
+	// a POST to wireserver must contain a body. For legacy purposes,
+	// an empty json string (two quote characters) should be sent by default.
 	body := []byte(`""`)
 	if len(payload) > 0 {
 		body = payload
