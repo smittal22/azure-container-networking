@@ -66,6 +66,7 @@ func (p *Proxy) UnpublishNC(ctx context.Context, ncParams cns.NetworkContainerPa
 	} else {
 		body = []byte("")
 	}
+	
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, reqURL, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, errors.Wrap(err, "wireserver proxy: unpublish nc: could not build http request")
