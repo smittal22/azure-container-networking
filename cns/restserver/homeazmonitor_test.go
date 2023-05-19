@@ -73,6 +73,19 @@ func TestHomeAzMonitor(t *testing.T) {
 			cns.HomeAzResponse{IsSupported: true},
 			true,
 		},
+		{
+			"api supported but got 404 not found error",
+			&fakes.NMAgentClientFake{
+				SupportedAPIsF: func(ctx context.Context) ([]string, error) {
+					return []string{GetHomeAzAPIName}, nil
+				},
+				GetHomeAzF: func(ctx context.Context) (nmagent.AzResponse, error) {
+					return nmagent.AzResponse{}, errors.New("not found")
+				},
+			},
+			cns.HomeAzResponse{IsSupported: false},
+			false,
+		},
 	}
 	for _, test := range tests {
 		test := test
