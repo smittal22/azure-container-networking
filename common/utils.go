@@ -26,7 +26,7 @@ const (
 	httpConnectionTimeout           = 7
 	headerTimeout                   = 7
 	RegisterNodeURLFmt              = "%s/networks/%s/node/%s%s"
-	SyncNodeNetworkContainersURLFmt = "%s/networks/%s/node/%s%s"
+	SyncNodeNetworkContainersURLFmt = "%s/networks/%s/node/%s/networkcontainers%s"
 	FiveSeconds                     = 5 * time.Second
 	JsonContent                     = "application/json; charset=UTF-8"
 	ContentType                     = "Content-Type"
